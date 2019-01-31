@@ -66,6 +66,8 @@ class ArticleController extends AbstractController
         // get() to fetch the value from the cache 
         $articleContent = $item->get();
 
+        dd($cache); die;
+
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
             'articleContent' =>$articleContent,
