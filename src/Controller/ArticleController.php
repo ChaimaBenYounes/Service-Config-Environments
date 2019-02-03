@@ -3,13 +3,9 @@
 namespace App\Controller;
 
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Michelf\MarkdownInterface;
-use Twig\Environment;
+use App\Service\MarkdownHelper;
 
 class ArticleController extends AbstractController
 {
@@ -24,7 +20,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}", name="article_show")
      */
-    public function show($slug, MarkdownInterface $markdown, AdapterInterface $cache)
+    public function show($slug, MarkdownHelper $markdownHelper)
     {
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
@@ -49,22 +45,7 @@ class ArticleController extends AbstractController
         fugiat.
         EOF";
 
-        //We need to pass this a cache key getItem('key'). 
-        //Use markdown_ and then md5($articleContent)
-        //it just creates a caheIteam Object in memory that can help us fetch and save to the cache.
-        $item = $cache->getItem('markdown_'.md5($articleContent));
-
-        //to check if this key is not already cached, use if (!$item->isHit()):
-        if (!$item->isHit()) {
-
-            //We need to put the item into cache
-            $item->set($markdown->transform($articleContent));
-            $cache->save($item);
-        }
-
-
-        // get() to fetch the value from the cache 
-        $articleContent = $item->get();
+        $articleContent = $markdownHelper->parse($articleContent);
 
         dd($cache); die;
 
